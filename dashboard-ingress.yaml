@@ -1,0 +1,101 @@
+# ingress allows external access to the services in the cluster like from the internet
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dashboard-ingress
+  namespace: kubernetes-dashboard
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kubernetes-dashboard
+                port:
+                  number: 80
+---
+# Multiple paths can be defined for the same host
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dashboard-ingress
+  namespace: kubernetes-dashboard
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: example.com
+      http:
+        paths:
+        - path: /dashboard
+          pathType: Prefix
+          backend:
+            service:
+              name: kubernetes-dashboard
+              port:
+                number: 80
+        - path: /api
+          pathType: Prefix
+          backend:
+            service:
+              name: kubernetes-dashboard
+              port:
+                number: 80
+---
+# Multiple subdomains as hosts can be defined
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dashboard-ingress
+  namespace: kubernetes-dashboard
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: analytics.example.com
+      http:
+        paths:
+          backend:
+            service:
+              name: kubernetes-dashboard
+              port:
+                number: 80
+    - host: api.example.com
+      http:
+        paths:
+          backend:
+            service:
+              name: kubernetes-dashboard
+              port:
+                number: 80
+---
+# Configure Tls certificate - https//
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dashboard-ingress
+  namespace: kubernetes-dashboard
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+  - hosts:
+    - example.com
+    secretName: example-com-tls # secretName is the name of the secret that contains the certificate and key. sceret must be in the same namespace as the ingress
+  rules:
+    - host: example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kubernetes-dashboard
+                port:
+                  number: 80
